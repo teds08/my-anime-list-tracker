@@ -1,1 +1,196 @@
-// app global css
+// ALT global styles
+
+:root {
+  --alt-bg: #050505;
+  --alt-surface: #0a0a0a;
+  --alt-surface-2: #101010;
+  --alt-surface-3: #151515;
+
+  --alt-border: #262626;
+  --alt-border-hover: #3a3a3a;
+
+  --alt-text: #f5f5f5;
+  --alt-text-secondary: #a3a3a3;
+  --alt-text-muted: #737373;
+
+  --alt-accent: #8b5cf6;
+  --alt-accent-hover: #a78bfa;
+  --alt-accent-soft: rgba(139, 92, 246, 0.14);
+
+  --alt-success: #22c55e;
+  --alt-warning: #f59e0b;
+  --alt-danger: #ef4444;
+
+  --alt-radius-sm: 6px;
+  --alt-radius-md: 10px;
+  --alt-radius-lg: 14px;
+
+  --alt-transition: 180ms ease;
+}
+
+html,
+body,
+#q-app {
+  min-height: 100%;
+  margin: 0;
+  background: var(--alt-bg);
+  color: var(--alt-text);
+}
+
+html {
+  background: var(--alt-bg);
+}
+
+body {
+  min-width: 320px;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+button {
+  cursor: pointer;
+}
+
+::selection {
+  background: var(--alt-accent);
+  color: #ffffff;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--alt-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: #2a2a2a;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3a3a3a;
+}
+
+/* Shared ALT surface */
+
+.alt-surface {
+  background: var(--alt-surface);
+  border: 1px solid var(--alt-border);
+}
+
+.alt-surface-hover {
+  transition:
+    border-color var(--alt-transition),
+    background-color var(--alt-transition),
+    transform var(--alt-transition),
+    box-shadow var(--alt-transition);
+}
+
+.alt-surface-hover:hover {
+  border-color: var(--alt-border-hover);
+  background: var(--alt-surface-2);
+}
+
+/* Shared interactive transition */
+
+.alt-interactive {
+  transition:
+    color var(--alt-transition),
+    background-color var(--alt-transition),
+    border-color var(--alt-transition),
+    opacity var(--alt-transition),
+    transform var(--alt-transition),
+    box-shadow var(--alt-transition);
+}
+
+/* Accent glow used sparingly */
+
+.alt-accent-glow {
+  box-shadow: 0 0 24px var(--alt-accent-soft);
+}
+
+/* Main anime hero image */
+
+.alt-hero-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.38;
+  mask-image:
+    linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, black 12%, black 82%, transparent 100%);
+  mask-composite: intersect;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, black 12%, black 82%, transparent 100%);
+  -webkit-mask-composite: source-in;
+}
+
+/* Anime card image hover */
+
+.alt-anime-image {
+  transition:
+    transform 300ms ease,
+    opacity 300ms ease;
+}
+
+.alt-anime-card:hover .alt-anime-image {
+  transform: scale(1.035);
+  opacity: 0.94;
+}
+
+/* Focus states */
+
+:focus-visible {
+  outline: 2px solid var(--alt-accent);
+  outline-offset: 2px;
+}
+
+/* Prevent accidental horizontal overflow */
+
+#q-app {
+  overflow-x: hidden;
+}
