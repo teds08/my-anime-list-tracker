@@ -9,14 +9,56 @@ import type { PaginatedResponse } from '../types/api';
 import { apiRequest } from './api';
 
 const ANIME_ENDPOINTS = {
-  list: '/anime',
-  details: (id: number) => `/anime/${id}`,
-  create: '/anime',
-  update: (id: number) => `/anime/${id}`,
-  delete: (id: number) => `/anime/${id}`,
-  favorite: (id: number) => `/anime/${id}/favorite`,
-  progress: (id: number) => `/anime/${id}/progress`,
+  list: '/api/anime',
+  details: (id: number) => `/api/anime/${id}`,
+  create: '/api/anime',
+  update: (id: number) => `/api/anime/${id}`,
+  delete: (id: number) => `/api/anime/${id}`,
+  favorite: (id: number) => `/api/anime/${id}/favorite`,
+  progress: (id: number) => `/api/anime/${id}/progress`,
 } as const;
+
+interface BackendAnime {
+  id: number;
+  user_id: number;
+  title: string;
+  description: string;
+  image_url: string;
+  image_public_id: string;
+  episodes: number;
+  progress: number;
+  status: Anime['status'];
+  is_favorite: boolean;
+  website_url: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+interface BackendAnimeListResponse {
+  message: string;
+  data: BackendAnime[];
+}
+
+interface BackendAnimeResponse {
+  message: string;
+  data: BackendAnime;
+}
+
+function mapAnime(anime: BackendAnime): Anime {
+  return {
+    id: anime.id,
+    title: anime.title,
+    description: anime.description,
+    cover_image: anime.image_url,
+    total_episodes: anime.episodes,
+    current_episode: anime.progress,
+    status: anime.status,
+    is_favorite: anime.is_favorite,
+    website_url: anime.website_url,
+    created_at: anime.created_at,
+    updated_at: anime.updated_at,
+  };
+}
 
 export interface GetAnimeParams {
   page: number;
@@ -31,42 +73,66 @@ export async function getAnime({
   filters,
   token,
 }: GetAnimeParams): Promise<PaginatedResponse<Anime>> {
-  const params = new URLSearchParams();
+  const response = await apiRequest<BackendAnimeListResponse>(ANIME_ENDPOINTS.list, {
+    method: 'GET',
+    token,
+  });
 
-  params.set('page', String(page));
-  params.set('limit', String(limit));
+  let animeList = response.data.map(mapAnime);
 
-  if (filters.search.trim()) {
-    params.set('search', filters.search.trim());
+  const search = filters.search.trim().toLowerCase();
+
+  if (search) {
+    animeList = animeList.filter((anime) => {
+      return (
+        anime.title.toLowerCase().includes(search) ||
+        anime.description.toLowerCase().includes(search)
+      );
+    });
   }
 
   if (filters.status !== 'All') {
-    params.set('status', filters.status);
+    animeList = animeList.filter((anime) => anime.status === filters.status);
   }
 
   if (filters.favoritesOnly) {
-    params.set('favorite', 'true');
+    animeList = animeList.filter((anime) => anime.is_favorite);
   }
 
-  return apiRequest<PaginatedResponse<Anime>>(`${ANIME_ENDPOINTS.list}?${params.toString()}`, {
-    method: 'GET',
-    token,
-  });
+  const total = animeList.length;
+  const totalPages = total > 0 ? Math.ceil(total / limit) : 0;
+
+  const startIndex = (page - 1) * limit;
+  const endIndex = startIndex + limit;
+
+  const items = animeList.slice(startIndex, endIndex);
+
+  return {
+    items,
+    total,
+    page,
+    limit,
+    totalPages,
+  };
 }
 
 export async function getAnimeById(id: number, token: string): Promise<Anime> {
-  return apiRequest<Anime>(ANIME_ENDPOINTS.details(id), {
+  const response = await apiRequest<BackendAnimeResponse>(ANIME_ENDPOINTS.details(id), {
     method: 'GET',
     token,
   });
+
+  return mapAnime(response.data);
 }
 
 export async function createAnime(payload: CreateAnimePayload, token: string): Promise<Anime> {
-  return apiRequest<Anime>(ANIME_ENDPOINTS.create, {
+  const response = await apiRequest<BackendAnimeResponse>(ANIME_ENDPOINTS.create, {
     method: 'POST',
     token,
     body: JSON.stringify(payload),
   });
+
+  return mapAnime(response.data);
 }
 
 export async function updateAnime(
@@ -74,11 +140,13 @@ export async function updateAnime(
   payload: UpdateAnimePayload,
   token: string,
 ): Promise<Anime> {
-  return apiRequest<Anime>(ANIME_ENDPOINTS.update(id), {
+  const response = await apiRequest<BackendAnimeResponse>(ANIME_ENDPOINTS.update(id), {
     method: 'PUT',
     token,
     body: JSON.stringify(payload),
   });
+
+  return mapAnime(response.data);
 }
 
 export async function deleteAnime(id: number, token: string): Promise<void> {
@@ -93,13 +161,15 @@ export async function toggleFavorite(
   isFavorite: boolean,
   token: string,
 ): Promise<Anime> {
-  return apiRequest<Anime>(ANIME_ENDPOINTS.favorite(id), {
+  const response = await apiRequest<BackendAnimeResponse>(ANIME_ENDPOINTS.favorite(id), {
     method: 'PATCH',
     token,
     body: JSON.stringify({
       is_favorite: isFavorite,
     }),
   });
+
+  return mapAnime(response.data);
 }
 
 export async function updateAnimeProgress(
@@ -107,9 +177,11 @@ export async function updateAnimeProgress(
   payload: UpdateAnimeProgressPayload,
   token: string,
 ): Promise<Anime> {
-  return apiRequest<Anime>(ANIME_ENDPOINTS.progress(id), {
+  const response = await apiRequest<BackendAnimeResponse>(ANIME_ENDPOINTS.progress(id), {
     method: 'PATCH',
     token,
     body: JSON.stringify(payload),
   });
+
+  return mapAnime(response.data);
 }

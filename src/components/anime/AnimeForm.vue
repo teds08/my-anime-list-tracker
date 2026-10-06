@@ -40,26 +40,47 @@
       </div>
 
       <div class="form-field form-field-full">
-        <label for="anime-cover">Cover Image URL</label>
+        <label for="anime-cover">Cover Image</label>
 
-        <q-input
+        <q-file
           id="anime-cover"
-          v-model.trim="form.cover_image"
+          v-model="coverImageFile"
           outlined
           dense
           dark
-          type="url"
-          placeholder="https://example.com/anime-cover.jpg"
+          clearable
+          accept=".jpg,.jpeg,.png,.webp,.gif,image/jpeg,image/png,image/webp,image/gif"
+          max-file-size="5242880"
+          placeholder="Select an anime cover image"
           :error="Boolean(errors.cover_image)"
           :error-message="errors.cover_image"
-          @update:model-value="clearError('cover_image')"
+          @update:model-value="handleCoverImageChange"
+          @rejected="handleCoverImageRejected"
         >
           <template #prepend>
+            <q-icon name="cloud_upload" size="18px" />
+          </template>
+
+          <template #append>
             <q-icon name="image" size="18px" />
           </template>
-        </q-input>
+        </q-file>
 
-        <div class="field-hint">Use a publicly accessible image URL.</div>
+        <div class="field-hint">JPG, JPEG, PNG, WEBP, or GIF. Maximum file size: 5 MB.</div>
+
+        <div v-if="coverImagePreview" class="cover-preview">
+          <div class="cover-preview-image-wrapper">
+            <img :src="coverImagePreview" alt="Anime cover preview" class="cover-preview-image" />
+          </div>
+
+          <div class="cover-preview-info">
+            <span class="cover-preview-label">Cover Preview</span>
+
+            <span class="cover-preview-status">
+              {{ coverImageFile ? 'New image selected' : 'Current image' }}
+            </span>
+          </div>
+        </div>
       </div>
 
       <div class="form-field">
@@ -164,7 +185,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { onBeforeUnmount, reactive, ref } from 'vue';
 
 import { ANIME_STATUS_OPTIONS } from '../../constants/anime';
 import type { Anime, CreateAnimePayload, UpdateAnimePayload } from '../../types/anime';
@@ -181,13 +202,17 @@ interface Props {
   loading?: boolean;
 }
 
+type AnimeFormSubmitPayload = (CreateAnimePayload | UpdateAnimePayload) & {
+  cover_image_file?: File;
+};
+
 const props = withDefaults(defineProps<Props>(), {
   submitLabel: 'Save Anime',
   loading: false,
 });
 
 const emit = defineEmits<{
-  submit: [payload: CreateAnimePayload | UpdateAnimePayload];
+  submit: [payload: AnimeFormSubmitPayload];
   cancel: [];
 }>();
 
@@ -202,6 +227,9 @@ const form = reactive({
   is_favorite: props.initialValues?.is_favorite ?? false,
   website_url: props.initialValues?.website_url ?? '',
 });
+
+const coverImageFile = ref<File | null>(null);
+const coverImagePreview = ref(props.initialValues?.cover_image ?? '');
 
 const errors = reactive({
   title: '',
@@ -229,6 +257,35 @@ function clearErrors() {
   formError.value = '';
 }
 
+function validateCoverImage(): boolean {
+  if (!coverImageFile.value) {
+    if (!form.cover_image.trim()) {
+      errors.cover_image = 'Cover image is required.';
+      return false;
+    }
+
+    return true;
+  }
+
+  const file = coverImageFile.value;
+
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+  if (!allowedTypes.includes(file.type)) {
+    errors.cover_image = 'Please select a JPG, PNG, WEBP, or GIF image.';
+    return false;
+  }
+
+  const maxFileSize = 5 * 1024 * 1024;
+
+  if (file.size > maxFileSize) {
+    errors.cover_image = 'Cover image must not exceed 5 MB.';
+    return false;
+  }
+
+  return true;
+}
+
 function validateForm(): boolean {
   clearErrors();
 
@@ -248,16 +305,8 @@ function validateForm(): boolean {
     valid = false;
   }
 
-  if (!form.cover_image.trim()) {
-    errors.cover_image = 'Cover image URL is required.';
+  if (!validateCoverImage()) {
     valid = false;
-  } else {
-    const coverUrlError = validateAnimeUrl(form.cover_image);
-
-    if (coverUrlError) {
-      errors.cover_image = coverUrlError;
-      valid = false;
-    }
   }
 
   const episodeError = validateEpisodeCount(Number(form.total_episodes));
@@ -272,7 +321,7 @@ function validateForm(): boolean {
     valid = false;
   }
 
-  const websiteError = validateAnimeWebsite(form.website_url);
+  const websiteError = validateWebsiteUrl(form.website_url);
 
   if (websiteError) {
     errors.website_url = websiteError;
@@ -282,22 +331,33 @@ function validateForm(): boolean {
   return valid;
 }
 
-function validateAnimeUrl(value: string): string | null {
-  try {
-    const parsedUrl = new URL(value.trim());
+function handleCoverImageChange(file: File | null) {
+  clearError('cover_image');
 
-    if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
-      return 'Cover image URL must use HTTP or HTTPS.';
-    }
-  } catch {
-    return 'Please enter a valid cover image URL.';
+  if (coverImagePreview.value.startsWith('blob:')) {
+    URL.revokeObjectURL(coverImagePreview.value);
   }
 
-  return null;
+  if (!file) {
+    coverImageFile.value = null;
+    coverImagePreview.value = props.initialValues?.cover_image ?? '';
+    return;
+  }
+
+  coverImageFile.value = file;
+  coverImagePreview.value = URL.createObjectURL(file);
 }
 
-function validateAnimeWebsite(value: string): string | null {
-  return validateWebsiteUrl(value);
+function handleCoverImageRejected() {
+  coverImageFile.value = null;
+
+  if (coverImagePreview.value.startsWith('blob:')) {
+    URL.revokeObjectURL(coverImagePreview.value);
+  }
+
+  coverImagePreview.value = props.initialValues?.cover_image ?? '';
+
+  errors.cover_image = 'Invalid image. Use JPG, PNG, WEBP, or GIF up to 5 MB.';
 }
 
 function handleSubmit() {
@@ -305,7 +365,7 @@ function handleSubmit() {
     return;
   }
 
-  const payload: CreateAnimePayload | UpdateAnimePayload = {
+  const payload: AnimeFormSubmitPayload = {
     title: form.title.trim(),
     description: form.description.trim(),
     cover_image: form.cover_image.trim(),
@@ -315,6 +375,11 @@ function handleSubmit() {
     ...(form.website_url.trim()
       ? {
           website_url: form.website_url.trim(),
+        }
+      : {}),
+    ...(coverImageFile.value
+      ? {
+          cover_image_file: coverImageFile.value,
         }
       : {}),
   };
@@ -329,6 +394,12 @@ function handleCancel() {
 
   emit('cancel');
 }
+
+onBeforeUnmount(() => {
+  if (coverImagePreview.value.startsWith('blob:')) {
+    URL.revokeObjectURL(coverImagePreview.value);
+  }
+});
 </script>
 
 <style scoped lang="scss">
@@ -415,8 +486,50 @@ function handleCancel() {
   resize: vertical;
 }
 
-:deep(.q-select .q-field__native) {
-  cursor: pointer;
+.cover-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+  padding: 10px;
+  border: 1px solid #1f1f1f;
+  border-radius: 9px;
+  background: #090909;
+}
+
+.cover-preview-image-wrapper {
+  width: 58px;
+  height: 78px;
+  flex: 0 0 58px;
+  overflow: hidden;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  background: #111111;
+}
+
+.cover-preview-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cover-preview-info {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.cover-preview-label {
+  color: #d4d4d4;
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.cover-preview-status {
+  margin-top: 3px;
+  color: #5a5a5a;
+  font-size: 9px;
 }
 
 .favorite-field {
@@ -531,12 +644,20 @@ function handleCancel() {
   .submit-button {
     flex: 1;
   }
+
+  .cover-preview {
+    align-items: flex-start;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .cancel-button,
   .submit-button {
     transition: none;
+  }
+
+  .submit-button {
+    transform: none;
   }
 }
 </style>

@@ -43,7 +43,7 @@ export interface UpdateAnimePayload {
 }
 
 export interface UpdateAnimeProgressPayload {
-  current_episode: number;
+  progress: number;
 }
 
 export interface AnimeListFilters {

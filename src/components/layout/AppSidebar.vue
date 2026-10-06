@@ -1,7 +1,6 @@
 <template>
   <q-drawer
     :model-value="modelValue"
-    show-if-above
     :breakpoint="900"
     bordered
     class="app-sidebar"

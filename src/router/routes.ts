@@ -13,28 +13,29 @@ import ErrorNotFound from '../pages/ErrorNotFound.vue';
 
 const routes: RouteRecordRaw[] = [
   {
-    path: '/',
+    path: '/login',
     component: AuthLayout,
     children: [
       {
-        path: 'login',
+        path: '',
         name: 'login',
         component: LoginPage,
-        meta: {
-          requiresGuest: true,
-        },
-      },
-      {
-        path: 'register',
-        name: 'register',
-        component: RegisterPage,
-        meta: {
-          requiresGuest: true,
-        },
+        meta: { requiresGuest: true },
       },
     ],
   },
-
+  {
+    path: '/register',
+    component: AuthLayout,
+    children: [
+      {
+        path: '',
+        name: 'register',
+        component: RegisterPage,
+        meta: { requiresGuest: true },
+      },
+    ],
+  },
   {
     path: '/',
     component: MainLayout,
@@ -43,37 +44,28 @@ const routes: RouteRecordRaw[] = [
         path: '',
         name: 'home',
         component: HomePage,
-        meta: {
-          requiresAuth: true,
-        },
+        meta: { requiresAuth: true },
       },
       {
         path: 'anime/create',
         name: 'anime-create',
         component: AnimeCreatePage,
-        meta: {
-          requiresAuth: true,
-        },
+        meta: { requiresAuth: true },
       },
       {
         path: 'anime/:id',
         name: 'anime-details',
         component: AnimeDetailsPage,
-        meta: {
-          requiresAuth: true,
-        },
+        meta: { requiresAuth: true },
       },
       {
         path: 'anime/:id/edit',
         name: 'anime-edit',
         component: AnimeEditPage,
-        meta: {
-          requiresAuth: true,
-        },
+        meta: { requiresAuth: true },
       },
     ],
   },
-
   {
     path: '/:catchAll(.*)*',
     name: 'not-found',

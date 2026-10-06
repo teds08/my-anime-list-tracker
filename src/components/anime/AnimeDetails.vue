@@ -167,7 +167,7 @@ async function handleProgressUpdate(currentEpisode: number) {
   }
 
   await updateProgress(anime.value.id, {
-    current_episode: currentEpisode,
+    progress: currentEpisode,
   });
 }
 

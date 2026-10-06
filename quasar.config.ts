@@ -20,6 +20,10 @@ export default defineConfig(() => {
         // node: 'node22'
       },
 
+      env: {
+        clientPrefix: ['QCLI_', 'VITE_'],
+      },
+
       typescript: {
         strict: true,
         vueShim: true,
@@ -84,19 +88,17 @@ export default defineConfig(() => {
       // onSsgRendererError: 'abort',
       // ssgRendererConcurrency: 1,
       // ssgRendererRetryCount: 0,
-      // ssgRendererRetryDelay: 1000,
+      // ssgRendererRetryDelay: 0,
       // ssgRendererDirectoryIndexes: true,
-      // error404HtmlFilename: '404.html',
+      // error404HtmlFilename: 'csr.html',
       // clientSideRenderingHtmlFilename: 'csr.html',
       // clientSideRenderingRoutes: [],
-      // noPreloadTagRoutes: [],
       // extendSSGRendererConf (rolldownConf) {},
       // extendSSGManifestJson (json) {},
       // manualStoreSerialization: true,
-      // manualStoreSsrContextInjection: true,
+      // manualStoreSerialization: true,
       // manualStoreHydration: true,
       // manualPostHydrationTrigger: true,
-      // prodScriptNamedExport: false,
     },
 
     pwa: {
