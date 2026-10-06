@@ -89,7 +89,7 @@
 
         <AnimeGrid
           :anime-list="animeList"
-          :is-loading="isLoading"
+          :is-loading="isLoading && animeList.length === 0"
           :error="gridError"
           :empty-title="emptyTitle"
           :empty-message="emptyMessage"

@@ -11,7 +11,7 @@ import { apiRequest } from './api';
 const ANIME_ENDPOINTS = {
   list: '/api/anime',
   details: (id: number) => `/api/anime/${id}`,
-  create: '/api/anime',
+  create: '/api/anime/create',
   update: (id: number) => `/api/anime/${id}`,
   delete: (id: number) => `/api/anime/${id}`,
   favorite: (id: number) => `/api/anime/${id}/favorite`,
@@ -44,6 +44,17 @@ interface BackendAnimeResponse {
   data: BackendAnime;
 }
 
+type AnimeFormPayload = {
+  title: string;
+  description: string;
+  cover_image: string;
+  total_episodes: number;
+  status: Anime['status'];
+  is_favorite: boolean;
+  website_url?: string;
+  cover_image_file?: File;
+};
+
 function mapAnime(anime: BackendAnime): Anime {
   return {
     id: anime.id,
@@ -58,6 +69,26 @@ function mapAnime(anime: BackendAnime): Anime {
     created_at: anime.created_at,
     updated_at: anime.updated_at,
   };
+}
+
+function createAnimeFormData(payload: AnimeFormPayload): FormData {
+  const formData = new FormData();
+
+  formData.append('title', payload.title);
+  formData.append('description', payload.description);
+  formData.append('episodes', String(payload.total_episodes));
+  formData.append('status', payload.status);
+  formData.append('is_favorite', String(payload.is_favorite));
+
+  if (payload.website_url?.trim()) {
+    formData.append('website_url', payload.website_url.trim());
+  }
+
+  if (payload.cover_image_file) {
+    formData.append('image', payload.cover_image_file);
+  }
+
+  return formData;
 }
 
 export interface GetAnimeParams {
@@ -125,11 +156,18 @@ export async function getAnimeById(id: number, token: string): Promise<Anime> {
   return mapAnime(response.data);
 }
 
-export async function createAnime(payload: CreateAnimePayload, token: string): Promise<Anime> {
+export async function createAnime(
+  payload: CreateAnimePayload & {
+    cover_image_file?: File;
+  },
+  token: string,
+): Promise<Anime> {
+  const formData = createAnimeFormData(payload);
+
   const response = await apiRequest<BackendAnimeResponse>(ANIME_ENDPOINTS.create, {
     method: 'POST',
     token,
-    body: JSON.stringify(payload),
+    body: formData,
   });
 
   return mapAnime(response.data);
@@ -137,13 +175,17 @@ export async function createAnime(payload: CreateAnimePayload, token: string): P
 
 export async function updateAnime(
   id: number,
-  payload: UpdateAnimePayload,
+  payload: UpdateAnimePayload & {
+    cover_image_file?: File;
+  },
   token: string,
 ): Promise<Anime> {
+  const formData = createAnimeFormData(payload);
+
   const response = await apiRequest<BackendAnimeResponse>(ANIME_ENDPOINTS.update(id), {
     method: 'PUT',
     token,
-    body: JSON.stringify(payload),
+    body: formData,
   });
 
   return mapAnime(response.data);

@@ -1,5 +1,18 @@
 <template>
   <q-page class="anime-details-page">
+    <div
+      v-if="anime?.cover_image"
+      class="page-background"
+      :style="{
+        backgroundImage: `url('${anime.cover_image}')`,
+      }"
+      aria-hidden="true"
+    ></div>
+
+    <div v-if="anime?.cover_image" class="page-background-overlay" aria-hidden="true"></div>
+
+    <div v-if="anime?.cover_image" class="page-background-vignette" aria-hidden="true"></div>
+
     <div class="page-container">
       <div class="page-header">
         <q-btn
@@ -197,12 +210,73 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .anime-details-page {
+  position: relative;
   min-height: calc(100vh - 64px);
+  overflow: hidden;
   background: #050505;
   color: #ffffff;
+  isolation: isolate;
+}
+
+.page-background {
+  position: fixed;
+  z-index: -4;
+  top: 64px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  filter: blur(1px) saturate(0.65);
+  opacity: 0.34;
+  transform: scale(1.03);
+  pointer-events: none;
+}
+
+.page-background-overlay {
+  position: fixed;
+  z-index: -3;
+  top: 64px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(5, 5, 5, 0.94) 0%,
+      rgba(5, 5, 5, 0.82) 30%,
+      rgba(5, 5, 5, 0.68) 62%,
+      rgba(5, 5, 5, 0.9) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(5, 5, 5, 0.7) 0%,
+      rgba(5, 5, 5, 0.38) 35%,
+      rgba(5, 5, 5, 0.94) 100%
+    );
+  pointer-events: none;
+}
+
+.page-background-vignette {
+  position: fixed;
+  z-index: -2;
+  top: 64px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: radial-gradient(
+    circle at 50% 38%,
+    transparent 0%,
+    rgba(5, 5, 5, 0.1) 34%,
+    rgba(5, 5, 5, 0.72) 100%
+  );
+  pointer-events: none;
 }
 
 .page-container {
+  position: relative;
+  z-index: 1;
   width: min(100%, 1180px);
   margin: 0 auto;
   padding: 30px 28px 50px;
@@ -217,15 +291,15 @@ onMounted(() => {
 
 .back-button {
   flex: 0 0 auto;
-  color: #6b6b6b;
+  color: #777777;
   transition:
     color 180ms ease,
     background-color 180ms ease;
 }
 
 .back-button:hover {
-  background: #101010;
-  color: #d4d4d4;
+  background: rgba(16, 16, 16, 0.8);
+  color: #e0e0e0;
 }
 
 .page-eyebrow {
@@ -238,7 +312,7 @@ onMounted(() => {
 
 .page-header h1 {
   margin: 0;
-  color: #e5e5e5;
+  color: #f0f0f0;
   font-size: 18px;
   font-weight: 700;
   line-height: 1.2;
@@ -324,6 +398,19 @@ onMounted(() => {
 
   .page-header {
     margin-bottom: 22px;
+  }
+
+  .page-background {
+    opacity: 0.26;
+  }
+
+  .page-background-overlay {
+    background: linear-gradient(
+      180deg,
+      rgba(5, 5, 5, 0.82) 0%,
+      rgba(5, 5, 5, 0.7) 42%,
+      rgba(5, 5, 5, 0.96) 100%
+    );
   }
 }
 

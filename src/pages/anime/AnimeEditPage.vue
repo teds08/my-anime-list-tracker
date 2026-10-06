@@ -93,10 +93,6 @@ async function handleSubmit(payload: CreateAnimePayload | UpdateAnimePayload) {
     return;
   }
 
-  if (!isUpdatePayload(payload)) {
-    return;
-  }
-
   try {
     const updatedAnime = await updateAnime(anime.value.id, payload);
 
@@ -106,12 +102,6 @@ async function handleSubmit(payload: CreateAnimePayload | UpdateAnimePayload) {
   } catch (requestError) {
     showError(getErrorMessage(requestError));
   }
-}
-
-function isUpdatePayload(
-  payload: CreateAnimePayload | UpdateAnimePayload,
-): payload is UpdateAnimePayload {
-  return 'id' in payload;
 }
 
 function goBack() {

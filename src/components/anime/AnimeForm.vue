@@ -2,11 +2,13 @@
   <q-form class="anime-form" @submit.prevent="handleSubmit">
     <div class="form-grid">
       <div class="form-field form-field-full">
-        <label for="anime-title">Title</label>
+        <span class="field-label">Title</span>
 
         <q-input
           id="anime-title"
+          name="title"
           v-model="form.title"
+          aria-label="Title"
           outlined
           dense
           dark
@@ -20,11 +22,13 @@
       </div>
 
       <div class="form-field form-field-full">
-        <label for="anime-description">Description</label>
+        <span class="field-label">Description</span>
 
         <q-input
           id="anime-description"
+          name="description"
           v-model="form.description"
+          aria-label="Description"
           outlined
           dense
           dark
@@ -40,11 +44,13 @@
       </div>
 
       <div class="form-field form-field-full">
-        <label for="anime-cover">Cover Image</label>
+        <span class="field-label">Cover Image</span>
 
         <q-file
           id="anime-cover"
+          name="cover_image"
           v-model="coverImageFile"
+          aria-label="Cover Image"
           outlined
           dense
           dark
@@ -74,7 +80,7 @@
           </div>
 
           <div class="cover-preview-info">
-            <span class="cover-preview-label">Cover Preview</span>
+            <span class="cover-preview-label"> Cover Preview </span>
 
             <span class="cover-preview-status">
               {{ coverImageFile ? 'New image selected' : 'Current image' }}
@@ -84,11 +90,13 @@
       </div>
 
       <div class="form-field">
-        <label for="anime-episodes">Total Episodes</label>
+        <span class="field-label">Total Episodes</span>
 
         <q-input
           id="anime-episodes"
+          name="episodes"
           v-model.number="form.total_episodes"
+          aria-label="Total Episodes"
           outlined
           dense
           dark
@@ -103,11 +111,13 @@
       </div>
 
       <div class="form-field">
-        <label for="anime-status">Status</label>
+        <span class="field-label">Status</span>
 
         <q-select
           id="anime-status"
+          name="status"
           v-model="form.status"
+          aria-label="Status"
           outlined
           dense
           dark
@@ -122,11 +132,13 @@
       </div>
 
       <div class="form-field form-field-full">
-        <label for="anime-website">Website URL</label>
+        <span class="field-label">Website URL</span>
 
         <q-input
           id="anime-website"
+          name="website_url"
           v-model.trim="form.website_url"
+          aria-label="Website URL"
           outlined
           dense
           dark
@@ -144,7 +156,13 @@
     </div>
 
     <div class="favorite-field">
-      <q-toggle v-model="form.is_favorite" color="primary" class="favorite-toggle" />
+      <q-toggle
+        v-model="form.is_favorite"
+        name="is_favorite"
+        aria-label="Add to favorites"
+        color="primary"
+        class="favorite-toggle"
+      />
 
       <div class="favorite-copy">
         <span class="favorite-title"> Add to favorites </span>
@@ -341,6 +359,7 @@ function handleCoverImageChange(file: File | null) {
   if (!file) {
     coverImageFile.value = null;
     coverImagePreview.value = props.initialValues?.cover_image ?? '';
+
     return;
   }
 
@@ -425,7 +444,7 @@ onBeforeUnmount(() => {
   grid-column: 1 / -1;
 }
 
-.form-field > label {
+.field-label {
   color: #d4d4d4;
   font-size: 11px;
   font-weight: 650;

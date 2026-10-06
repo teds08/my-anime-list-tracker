@@ -157,9 +157,18 @@ async function handleLogout() {
 
 <style scoped lang="scss">
 .app-sidebar {
-  border-right: 1px solid #1d1d1d;
-  background: #080808;
+  border-right: 1px solid #151515;
+  background: #050505;
   color: #ffffff;
+}
+
+.app-sidebar :deep(.q-drawer) {
+  border-right: 1px solid #151515;
+  background: #050505;
+}
+
+.app-sidebar :deep(.q-drawer__content) {
+  background: #050505;
 }
 
 .sidebar-content {
@@ -168,6 +177,7 @@ async function handleLogout() {
   min-height: calc(100vh - 64px);
   flex-direction: column;
   padding: 22px 14px 16px;
+  background: #050505;
 }
 
 .sidebar-brand {
@@ -181,7 +191,7 @@ async function handleLogout() {
   display: inline-flex;
   align-items: center;
   gap: 1px;
-  color: #ffffff;
+  color: #f5f5f5;
   font-size: 21px;
   font-weight: 800;
   line-height: 1;
@@ -199,13 +209,13 @@ async function handleLogout() {
 }
 
 .sidebar-brand-text strong {
-  color: #e5e5e5;
+  color: #dcdcdc;
   font-size: 12px;
   font-weight: 700;
 }
 
 .sidebar-brand-text span {
-  color: #525252;
+  color: #454545;
   font-size: 10px;
 }
 
@@ -216,7 +226,7 @@ async function handleLogout() {
 .sidebar-label {
   display: block;
   padding: 0 12px 7px;
-  color: #444444;
+  color: #393939;
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.15em;
@@ -231,7 +241,8 @@ async function handleLogout() {
   margin-bottom: 3px;
   border: 1px solid transparent;
   border-radius: 8px;
-  color: #737373;
+  background: transparent;
+  color: #656565;
   transition:
     background-color 180ms ease,
     border-color 180ms ease,
@@ -240,26 +251,27 @@ async function handleLogout() {
 }
 
 .nav-item:hover {
-  border-color: #1e1e1e;
-  background: #101010;
-  color: #d4d4d4;
+  border-color: #181818;
+  background: #090909;
+  color: #bdbdbd;
   transform: translateX(1px);
 }
 
 .nav-item-active {
-  border-color: rgba(139, 92, 246, 0.2);
-  background: rgba(139, 92, 246, 0.09);
-  color: #c4b5fd;
+  border-color: rgba(139, 92, 246, 0.16);
+  background: rgba(139, 92, 246, 0.07);
+  color: #bcaef5;
 }
 
 .nav-item-active:hover {
-  border-color: rgba(139, 92, 246, 0.28);
-  background: rgba(139, 92, 246, 0.12);
+  border-color: rgba(139, 92, 246, 0.22);
+  background: rgba(139, 92, 246, 0.09);
   color: #c4b5fd;
 }
 
 .nav-item :deep(.q-item__section--avatar) {
   min-width: 38px;
+  color: inherit;
 }
 
 .nav-item :deep(.q-item__label) {
@@ -274,7 +286,7 @@ async function handleLogout() {
 .sidebar-footer-line {
   height: 1px;
   margin: 0 8px 14px;
-  background: #1c1c1c;
+  background: #161616;
 }
 
 .sidebar-user {
@@ -291,10 +303,10 @@ async function handleLogout() {
   align-items: center;
   justify-content: center;
   flex: 0 0 32px;
-  border: 1px solid rgba(139, 92, 246, 0.35);
+  border: 1px solid rgba(139, 92, 246, 0.28);
   border-radius: 50%;
-  background: rgba(139, 92, 246, 0.12);
-  color: #c4b5fd;
+  background: #0a0a0a;
+  color: #b8a7f2;
   font-size: 12px;
   font-weight: 700;
 }
@@ -308,7 +320,7 @@ async function handleLogout() {
 
 .sidebar-user-info strong {
   overflow: hidden;
-  color: #d4d4d4;
+  color: #cecece;
   font-size: 11px;
   font-weight: 600;
   text-overflow: ellipsis;
@@ -317,20 +329,20 @@ async function handleLogout() {
 
 .sidebar-user-info span {
   margin-top: 2px;
-  color: #4d4d4d;
+  color: #414141;
   font-size: 9px;
 }
 
 .logout-button {
-  color: #555555;
+  color: #484848;
   transition:
     color 180ms ease,
     background-color 180ms ease;
 }
 
 .logout-button:hover {
-  background: rgba(239, 68, 68, 0.08);
-  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.06);
+  color: #e79a9a;
 }
 
 @media (max-width: 480px) {
