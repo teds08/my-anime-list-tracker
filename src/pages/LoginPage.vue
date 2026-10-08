@@ -53,15 +53,14 @@
 
           <q-form class="login-form" greedy @submit.prevent="handleLogin">
             <div class="form-field">
-              <label for="email">Email</label>
-
               <q-input
-                id="email"
                 v-model.trim="email"
                 outlined
                 dense
                 dark
                 type="email"
+                name="email"
+                label="Email"
                 autocomplete="email"
                 placeholder="Enter your email"
                 :error="Boolean(emailError)"
@@ -75,17 +74,14 @@
             </div>
 
             <div class="form-field">
-              <div class="password-label-row">
-                <label for="password">Password</label>
-              </div>
-
               <q-input
-                id="password"
                 v-model="password"
                 outlined
                 dense
                 dark
                 :type="showPassword ? 'text' : 'password'"
+                name="password"
+                label="Password"
                 autocomplete="current-password"
                 placeholder="Enter your password"
                 :error="Boolean(passwordError)"
@@ -98,6 +94,7 @@
 
                 <template #append>
                   <q-btn
+                    type="button"
                     flat
                     round
                     dense
@@ -203,6 +200,35 @@ function validateForm(): boolean {
   return isValid;
 }
 
+function getLoginErrorMessage(error: unknown): string {
+  if (!(error instanceof ApiError)) {
+    return 'Unable to connect to the server. Please check your connection and try again.';
+  }
+
+  switch (error.status) {
+    case 400:
+      return error.message || 'Please check your email and password.';
+
+    case 401:
+      return 'Incorrect email or password. Please try again.';
+
+    case 403:
+      return error.message || 'Your account is not allowed to sign in.';
+
+    case 429:
+      return error.message || 'Too many login attempts. Please wait a few minutes and try again.';
+
+    case 500:
+    case 502:
+    case 503:
+    case 504:
+      return 'The server is temporarily unavailable. Please try again later.';
+
+    default:
+      return error.message || 'Unable to sign in. Please try again.';
+  }
+}
+
 async function handleLogin() {
   if (!validateForm()) {
     return;
@@ -221,11 +247,7 @@ async function handleLogin() {
 
     await router.push('/');
   } catch (error) {
-    if (error instanceof ApiError) {
-      formError.value = error.message || 'Unable to sign in. Please check your credentials.';
-    } else {
-      formError.value = 'Unable to connect to the server. Please try again.';
-    }
+    formError.value = getLoginErrorMessage(error);
   } finally {
     isLoading.value = false;
   }
@@ -402,18 +424,6 @@ function goToRegister() {
   gap: 8px;
 }
 
-.form-field > label {
-  color: #d4d4d4;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.password-label-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
 :deep(.q-field--outlined .q-field__control) {
   min-height: 46px;
   border-radius: 9px;
@@ -430,6 +440,16 @@ function goToRegister() {
 
 :deep(.q-field--outlined.q-field--focused .q-field__control::after) {
   border-color: #8b5cf6;
+}
+
+:deep(.q-field__label) {
+  color: #d4d4d4;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+:deep(.q-field--focused .q-field__label) {
+  color: #a78bfa;
 }
 
 :deep(.q-field__native),

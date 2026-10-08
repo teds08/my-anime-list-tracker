@@ -2,7 +2,19 @@
   <q-page class="home-page">
     <div class="home-container">
       <section class="hero-section">
-        <div class="hero-image"></div>
+        <video
+          class="hero-video"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          poster="/images/backgrounds/alt-hero.jpg"
+          aria-hidden="true"
+        >
+          <source src="/videos/guyHalo.mp4" type="video/mp4" />
+        </video>
+
         <div class="hero-overlay"></div>
         <div class="hero-vignette"></div>
 
@@ -267,13 +279,16 @@ onUnmounted(() => {
   isolation: isolate;
 }
 
-.hero-image {
+.hero-video {
   position: absolute;
   inset: 0;
   z-index: -3;
-  background: url('/images/backgrounds/alt-hero.jpg') center / cover no-repeat;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   opacity: 0.58;
   filter: saturate(0.8);
+  pointer-events: none;
 }
 
 .hero-overlay {
@@ -545,7 +560,7 @@ onUnmounted(() => {
     min-height: 420px;
   }
 
-  .hero-image {
+  .hero-video {
     opacity: 0.44;
   }
 
@@ -615,10 +630,12 @@ onUnmounted(() => {
     transition: none;
   }
 
-  .hero-secondary-button,
-  .hero-primary-button,
-  .add-anime-button {
-    transform: none;
+  .hero-video {
+    display: none;
+  }
+
+  .hero-section {
+    background: url('/images/backgrounds/alt-hero.jpg') center / cover no-repeat;
   }
 }
 </style>
