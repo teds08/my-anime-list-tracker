@@ -5,6 +5,6 @@ export interface PaginationState {
   totalPages: number;
 }
 
-export const PAGINATION_LIMITS = [6, 12, 24, 48] as const;
+export const PAGINATION_LIMITS = [4, 12, 24, 48] as const;
 
 export type PaginationLimit = (typeof PAGINATION_LIMITS)[number];
